@@ -27,3 +27,19 @@ Le fichier généré se trouve dans le dossier ```/build/distributions```.
 * Create cloudformation to deploy our app : ```aws --region eu-west-3 cloudformation package --template-file sam.yaml --output-template-file output-sam.yaml --s3-bucket springboot2-aws-lambda```
 * Run : ```aws --region eu-west-3 cloudformation deploy --template-file output-sam.yaml --stack-name springboot2AwsLambda --capabilities CAPABILITY_IAM```
 * View configuration: ```aws --region eu-west-3 cloudformation describe-stacks --stack-name springboot2AwsLambda```
+
+### Auto deploy with Github Action
+#### Add secrets to your Repo
+A Github action is defined in ````/github/workflows```` directory to automatise the deployement.
+
+You have to define : 
+* AWS_ACCESS_KEY_ID
+* AWS_SECRET_ACCESS_KEY 
+* AWS_REGION
+* AWS_S3_BUCKET
+* AWS_LAMBDA_FUNCTION
+
+You have to enable these permissions policies for your AWS user :
+* AmazonS3FullAccess
+* AWSCloudFormationFullAccess 
+* AWSLambda_FullAccess
