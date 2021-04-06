@@ -1,0 +1,33 @@
+name: deploy to lambda
+on: [push]
+jobs:
+
+  deploy_zip:
+    name: deploy lambda function
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    strategy:
+      matrix:
+        java: [ '11' ]
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v1
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+      - name: Run the Gradle package task
+        run: ./gradlew clean build
+      - name: Create cloud formation
+        uses: giboow/action-aws-cli@v1
+        with:
+          args: cloudformation package --template-file sam.yaml --output-template-file output-sam.yaml --s3-bucket ${{ secrets.AWS_S3_BUCKET }}
+      - name: Update lambda
+        uses: giboow/action-aws-cli@v1
+        with:
+          args: cloudformation deploy --template-file output-sam.yaml --stack-name ${{ secrets.AWS_LAMBDA_FUNCTION }} --capabilities CAPABILITY_IAM

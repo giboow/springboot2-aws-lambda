@@ -37,3 +37,5 @@ out/
 .vscode/
 
 output-sam.yaml
+
+.secrets
