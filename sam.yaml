@@ -23,6 +23,25 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: any
+  AwsLambdaSqsLocal:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: fr.giboow.springboot2awslambda.SQSEventHandler
+      Description: For AWS Sqs Queue
+      Runtime: java11
+      CodeUri: build/distributions/springboot2-aws-lambda-0.0.1-SNAPSHOT.zip
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+      Environment:
+        Variables:
+          SPRING_PROFILES_ACTIVE: prod
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+
 
 Outputs:
   Springboot2AwsLambdaApi:
